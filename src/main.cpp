@@ -1,26 +1,23 @@
 #include <Arduino.h>
 #include "hardware.h"
 #include "irsensor.h"
+#include "STM32FreeRTOS.h"
+
+TaskHandle_t h_mainLoop = NULL;
+
+void mainLoop(void* p){
+
+}
 
 void setup() 
 {
-  Serial.begin(115200);
   IR_sensor.init();
   strip.init();
+  xTaskCreate(mainLoop, "main loop", 256, NULL, 1, &h_mainLoop);
 }
 
 void loop() 
 {
-  if(IR_sensor.isTrigd())
-  {
-    if(strip.on)
-    {
-      strip.dim(DOWN, strip.warm_white);
-    }
-    else
-    {
-      strip.dim(UP, strip.warm_white);
-    }
-    IR_sensor.trig(false);
-  }
+  ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
 }

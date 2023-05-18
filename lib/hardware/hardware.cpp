@@ -1,4 +1,5 @@
 #include "hardware.h"
+#include "STM32FreeRTOS.h"
 
 c_strip strip;
 
@@ -19,94 +20,35 @@ void c_led::level(uint8_t level)
     analogWrite(pin, level);
 }
 
-
-c_color::c_color(uint8_t _red, uint8_t _green, uint8_t _blue)
-{
-    red = _red;
-    green = _green;
-    blue = _blue;
-}
-
-
 void c_strip::init()
 {
-    r.init(PIN_R);
-    g.init(PIN_G);
-    b.init(PIN_B);
+    led.init(PIN_LED);
 }
 
-void c_strip::light(c_color color)
+void c_strip::light()
 {
     on = true;
-    r.level(color.red);
-    g.level(color.green);
-    b.level(color.blue);
+    led.level(MAX_PWM);
 }
 
 void c_strip::off()
 {
     on = false;
-    r.level(0);
-    g.level(0);
-    b.level(0);
+    led.level(0);
 }
 
-void c_strip::dim(uint8_t direction, c_color color)
+void c_strip::dim(uint8_t direction)
 {
-    uint8_t r_step_size;
-    uint8_t g_step_size;
-    uint8_t b_step_size;
-
-    if(color.red == 0)
-    {
-        r_step_size = 0;
-    }
-    else
-    {
-        r_step_size = (uint8_t)(1 / (((float)color.red) / MAX_PWM));
-    }
-
-    if(color.green == 0)
-    {
-        g_step_size = 0;
-    }
-    else
-    {
-        g_step_size = (uint8_t)(1 / (((float)color.green) / MAX_PWM));
-    }
-
-    if(color.blue == 0)
-    {
-        b_step_size = 0;
-    }
-    else
-    {
-        b_step_size = (uint8_t)(1 / (((float)color.blue) / MAX_PWM));
-    }
-
-    if(direction == UP)
-    {
-        strip.off();
-        for(uint8_t i = 0; i < MAX_PWM; i++)
-        {
-            if(r_step_size != 0) r.level((uint8_t)(((float)i) / r_step_size));
-            if(g_step_size != 0) g.level((uint8_t)(((float)i) / g_step_size));
-            if(b_step_size != 0) b.level((uint8_t)(((float)i) / b_step_size));
-            delay(_DIM_TIME);
+    if(direction == UP){
+        for(uint8_t i = 0; i < MAX_PWM; i++){
+            led.level(i);
+            vTaskDelay(_DIM_TIME / portTICK_PERIOD_MS);
         }
-        strip.light(color);
     }
-    else
-    {
-        strip.light(color);
-        for(uint8_t i = MAX_PWM; i > 0; i--)
-        {
-            if(r_step_size != 0) r.level((uint8_t)(((float)i) / r_step_size));
-            if(g_step_size != 0) g.level((uint8_t)(((float)i) / g_step_size));
-            if(b_step_size != 0) b.level((uint8_t)(((float)i) / b_step_size));
-            delay(_DIM_TIME);
+    else{
+        for(uint8_t i = MAX_PWM; i > 0; i--){
+            led.level(i);
+            vTaskDelay(_DIM_TIME / portTICK_PERIOD_MS);
         }
-        strip.off();
     }
-    
 }

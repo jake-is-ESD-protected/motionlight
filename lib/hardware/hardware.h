@@ -3,11 +3,7 @@
 
 #include <Arduino.h>
 
-#define PIN_R           5
-#define PIN_G           9
-#define PIN_B           6
-
-#define WARM_WHITE      255, 120, 20
+#define PIN_LED         PA12
 
 #define DOWN            0
 #define UP              1
@@ -31,35 +27,19 @@ private:
 };
 
 
-class c_color
-{
-public:
-    uint8_t red = 0;
-    uint8_t green = 0;
-    uint8_t blue = 0;
-    c_color(uint8_t _red=0, uint8_t _green=0, uint8_t _blue=0);
-private:
-};
-
-
 class c_strip
 {
 public:
-    c_strip() : warm_white(WARM_WHITE) {}
+    c_strip();
     void init();
-    void light(c_color color);
+    void light();
     void off();
-    void dim(uint8_t direction, c_color color);
-
-    const c_color warm_white{WARM_WHITE};
+    void dim(uint8_t direction);
 
     bool on = false;
 
 private:
-    c_led r;
-    c_led g;
-    c_led b;
-
+    c_led led;
 };
 
 extern c_strip strip;

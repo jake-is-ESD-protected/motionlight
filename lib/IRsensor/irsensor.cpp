@@ -4,13 +4,15 @@ c_IR_sensor IR_sensor;
 
 static uint32_t last_isr = 0;
 
-void IR_ISR()
+void irISR()
 {
     uint32_t irt = millis();
     if(irt - last_isr > ISR_DEBOUNCE)
     {
         IR_sensor.now();
-        IR_sensor.trig(true);
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(h_mainLoop, 
+                               &xHigherPriorityTaskWoken);
     }
     last_isr = irt;
 }
@@ -23,17 +25,7 @@ c_IR_sensor::c_IR_sensor()
 void c_IR_sensor::init()
 {
     pinMode(PIN_SENSE, INPUT);
-    attachInterrupt(digitalPinToInterrupt(PIN_SENSE), IR_ISR, RISING);
-}
-
-bool c_IR_sensor::isTrigd()
-{
-    return trigd;
-}
-
-void c_IR_sensor::trig(bool state)
-{
-    trigd = state;
+    attachInterrupt(digitalPinToInterrupt(PIN_SENSE), irISR, RISING);
 }
 
 uint32_t c_IR_sensor::getLast()
