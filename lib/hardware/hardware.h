@@ -7,13 +7,13 @@
 #define PIN_G           9
 #define PIN_B           6
 
-#define WARM_WHITE      255, 120, 20
+#define WARM_WHITE      0, 0, 255
 
 #define DOWN            0
 #define UP              1
 
 #define MAX_PWM         255
-#define DIM_TIME        2
+#define DIM_TIME        3
 #define _DIM_TIME       (uint16_t)((1000 * (float)DIM_TIME) / (MAX_PWM))
 
 

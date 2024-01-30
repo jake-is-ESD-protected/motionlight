@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define PIN_SENSE       PA8
+#define PIN_SENSE       2
 #define ISR_DEBOUNCE    100  
 
 class c_IR_sensor
